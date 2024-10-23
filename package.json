@@ -1,0 +1,28 @@
+{
+  "name": "substrate-message-queue-bot",
+  "version": "1.0.0",
+  "description": "A bot for processing Substrate messageQueue extrinsics",
+  "main": "start.js",
+  "scripts": {
+    "start": "node start.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@polkadot/api": "^14.1.1",
+    "@polkadot/util": "^13.2.1",
+    "@polkadot/keyring": "^13.2.1",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "substrate",
+    "polkadot",
+    "blockchain",
+    "messagequeue",
+    "bot"
+  ],
+  "author": "",
+  "license": "MIT"
+}
