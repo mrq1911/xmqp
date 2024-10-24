@@ -6,6 +6,7 @@ class MessageQueueBot {
     this.wsEndpoint = wsEndpoint;
     this.api = null;
     this.account = null;
+    this.cooldown = 0;
     this.isProcessing = false;
     this.unsubscribeNewHeads = null;
   }
@@ -37,17 +38,25 @@ class MessageQueueBot {
     }
 
     try {
+      this.cooldown--;
       this.isProcessing = true;
       console.log(`Processing block: ${blockHash}`);
+
+      const head = await this.api.query.messageQueue.serviceHead().then(h => h.toHuman());
+      if (head !== null) {
+        console.log('On chain processing of', head);
+        this.cooldown = 4;
+        return;
+      }
+
+      if (this.cooldown > 0) {
+        console.log(`On cooldown`, this.cooldown);
+        return;
+      }
 
       const pages = await this.loadPages();
       if (pages.length === 0) {
         console.log('No messages to process');
-        return;
-      }
-      const head = await this.api.query.messageQueue.serviceHead().then(h => h.toHuman());
-      if (head !== null) {
-        console.log('On chain processing of', head);
         return;
       }
 
@@ -87,8 +96,6 @@ class MessageQueueBot {
       const batchCall = this.api.tx.utility.forceBatch(batch);
 
       console.log(batchCall.toHex())
-
-      const callFinished = new Promise();
       
       // Sign and send the transaction
       const unsub = await batchCall.signAndSend(this.account, ({ status, events = [] }) => {
@@ -107,7 +114,6 @@ class MessageQueueBot {
           });
         } else if (status.isFinalized) {
           console.log(`Finalized block hash: ${status.asFinalized}`);
-          callFinished.
           unsub();
         }
       });
