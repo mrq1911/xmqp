@@ -81,6 +81,7 @@ class MessageQueueBot {
       if (batch.length > 0) {
         console.log(`Sending batch of ${batch.length} extrinsics`);
         await this.sendBatch(batch);
+        this.cooldown = 4;
       }
 
     } catch (error) {
