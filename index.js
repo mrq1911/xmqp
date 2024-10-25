@@ -60,7 +60,7 @@ class MessageQueueBot {
         return;
       }
 
-      const batch = [];
+      let batch = [];
       // Calculate a reasonable weight limit based on your chain's configuration
       const weightLimit = { refTime: 1000000000, proofSize: 100000 }; 
 
@@ -79,6 +79,7 @@ class MessageQueueBot {
       }
 
       if (batch.length > 0) {
+        batch = batch.slice(0, process.env.BATCH_LIMIT || 10)
         console.log(`Sending batch of ${batch.length} extrinsics`);
         await this.sendBatch(batch);
         this.cooldown = 4;
@@ -109,6 +110,7 @@ class MessageQueueBot {
               console.log('\tExtrinsic succeeded');
             } else if (method === 'ExtrinsicFailed') {
               console.log('\tExtrinsic failed:', data.toString());
+              this.cooldown = 100;
             } else {
               console.log(`\t${section}.${method}:`, data.toString());
             }
