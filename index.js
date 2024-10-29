@@ -77,7 +77,7 @@ class MessageQueueBot {
           );
 
           if (this.banned.has(call.toHex())) {
-            console.log('This call is banned, skipping...')
+            console.log('Call is banned:', call.toHex());
           } else {
             batch.push(call);
           }
@@ -117,7 +117,7 @@ class MessageQueueBot {
               console.log('\tProcessed:', extrinsic);
               item++;
             } else if (method === 'ItemFailed') {
-              console.log('\tFailed:', extrinsic, data);
+              console.log('\tFailed:', extrinsic, data.toString());
               this.banned.add(extrinsic);
               item++;
             } else if (method === 'ExtrinsicSuccess') {
