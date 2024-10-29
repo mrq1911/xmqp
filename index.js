@@ -9,6 +9,7 @@ class MessageQueueBot {
     this.cooldown = 0;
     this.isProcessing = false;
     this.unsubscribeNewHeads = null;
+    this.banned = new Set();
   }
 
   async initialize() {
@@ -74,7 +75,12 @@ class MessageQueueBot {
             0,             // index is always 0
             weightLimit    // weight_limit
           );
-          batch.push(call);
+
+          if (this.banned.has(call.toHex())) {
+            console.log('This call is banned, skipping...')
+          } else {
+            batch.push(call);
+          }
         }
       }
 
@@ -102,15 +108,23 @@ class MessageQueueBot {
       // Sign and send the transaction
       const unsub = await batchCall.signAndSend(this.account, ({ status, events = [] }) => {
         console.log(`Transaction status: ${status.type}`);
-
+        const item =  0;
         if (status.isInBlock) {
           console.log(`Included in block: ${status.asInBlock}`);
           events.forEach(({ event: { data, method, section } }) => {
-            if (method === 'ExtrinsicSuccess') {
+            const extrinsic = batch[item];
+            if (method === 'ItemCompleted') {
+              console.log('\tProcessed:', extrinsic.toHuman());
+              item++;
+            } else if (method === 'ItemFailed') {
+              console.log('\tFailed:', extrinsic.toHuman(), data);
+              this.banned.add(extrinsic.toHex());
+              item++;
+            } else if (method === 'ExtrinsicSuccess') {
               console.log('\tExtrinsic succeeded');
             } else if (method === 'ExtrinsicFailed') {
               console.log('\tExtrinsic failed:', data.toString());
-              this.cooldown = 100;
+              this.cooldown = 300;
             } else {
               console.log(`\t${section}.${method}:`, data.toString());
             }
