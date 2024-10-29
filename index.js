@@ -63,7 +63,7 @@ class MessageQueueBot {
 
       let batch = [];
       // Calculate a reasonable weight limit based on your chain's configuration
-      const weightLimit = { refTime: 1000000000, proofSize: 100000 }; 
+      const weightLimit = { refTime: process.env.REF_TIME || 1000000000, proofSize: process.env.PROOF_SIZE || 100000 }; 
 
       for (const { messageOrigin, pageIndex, data } of pages) {
         if (data.remaining > 0) {
@@ -112,13 +112,13 @@ class MessageQueueBot {
         if (status.isInBlock) {
           console.log(`Included in block: ${status.asInBlock}`);
           events.forEach(({ event: { data, method, section } }) => {
-            const extrinsic = batch[item];
+            const extrinsic = batch[item].toHex();
             if (method === 'ItemCompleted') {
-              console.log('\tProcessed:', extrinsic.toHuman());
+              console.log('\tProcessed:', extrinsic);
               item++;
             } else if (method === 'ItemFailed') {
-              console.log('\tFailed:', extrinsic.toHuman(), data);
-              this.banned.add(extrinsic.toHex());
+              console.log('\tFailed:', extrinsic, data);
+              this.banned.add(extrinsic);
               item++;
             } else if (method === 'ExtrinsicSuccess') {
               console.log('\tExtrinsic succeeded');
