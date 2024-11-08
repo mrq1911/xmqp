@@ -62,7 +62,7 @@ class MessageQueueBot {
       }
 
       let batch = [];
-      const weightLimit = { refTime: process.env.REF_TIME || 1000000000, proofSize: process.env.PROOF_SIZE || 100000 }; 
+      const weightLimit = { refTime: process.env.REF_TIME || 1000000000, proofSize: process.env.PROOF_SIZE || 100000 };
 
       for (const { messageOrigin, pageIndex, data } of pages) {
         if (data.remaining > 0) {
@@ -111,7 +111,7 @@ class MessageQueueBot {
         if (status.isInBlock) {
           console.log(`Included in block: ${status.asInBlock}`);
           events.forEach(({ event: { data, method, section } }) => {
-            const extrinsic = batch[item].toHex();
+            const extrinsic = batch[item]?.toHex();
             if (method === 'ItemCompleted') {
               console.log('\tProcessed:', extrinsic);
               item++;
