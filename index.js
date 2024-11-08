@@ -63,12 +63,16 @@ class MessageQueueBot {
 
       let batch = [];
       // Calculate a reasonable weight limit based on your chain's configuration
+<<<<<<< HEAD
       const weightLimit = { refTime: process.env.REF_TIME || 1000000000, proofSize: process.env.PROOF_SIZE || 100000 }; 
+=======
+      const weightLimit = { refTime: 1000000000, proofSize: 100000 };
+>>>>>>> e286876d6bb592ded8fd5fbfa63da26395091db8
 
       for (const { messageOrigin, pageIndex, data } of pages) {
         if (data.remaining > 0) {
           console.log(`Creating extrinsic for messageOrigin:`, messageOrigin, `page:`, pageIndex);
-          
+
           const call = this.api.tx.messageQueue.executeOverweight(
             messageOrigin,  // message_origin from storage key
             pageIndex,      // page number from storage key
@@ -104,11 +108,11 @@ class MessageQueueBot {
       const batchCall = this.api.tx.utility.forceBatch(batch);
 
       console.log(batchCall.toHex())
-      
+
       // Sign and send the transaction
       const unsub = await batchCall.signAndSend(this.account, ({ status, events = [] }) => {
         console.log(`Transaction status: ${status.type}`);
-        const item =  0;
+        let item =  0;
         if (status.isInBlock) {
           console.log(`Included in block: ${status.asInBlock}`);
           events.forEach(({ event: { data, method, section } }) => {
@@ -148,7 +152,7 @@ class MessageQueueBot {
       });
 
       await this.initialize();
-      
+
       // Subscribe to new blocks
       this.unsubscribeNewHeads = await this.api.rpc.chain.subscribeNewHeads((header) => {
         this.processNewBlock(header.hash.toString());
