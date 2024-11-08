@@ -62,12 +62,7 @@ class MessageQueueBot {
       }
 
       let batch = [];
-      // Calculate a reasonable weight limit based on your chain's configuration
-<<<<<<< HEAD
       const weightLimit = { refTime: process.env.REF_TIME || 1000000000, proofSize: process.env.PROOF_SIZE || 100000 }; 
-=======
-      const weightLimit = { refTime: 1000000000, proofSize: 100000 };
->>>>>>> e286876d6bb592ded8fd5fbfa63da26395091db8
 
       for (const { messageOrigin, pageIndex, data } of pages) {
         if (data.remaining > 0) {
