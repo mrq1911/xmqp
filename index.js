@@ -35,6 +35,7 @@ class MessageQueueBot {
   async processNewBlock(blockHash) {
     if (this.isProcessing) {
       console.log('Already processing a block, skipping...');
+      this.cooldown = 2;
       return;
     }
 
@@ -46,7 +47,7 @@ class MessageQueueBot {
       const head = await this.api.query.messageQueue.serviceHead().then(h => h.toHuman());
       if (head !== null) {
         console.log('On chain processing of', head);
-        this.cooldown = 4;
+        this.cooldown = 6;
         return;
       }
 
@@ -87,7 +88,7 @@ class MessageQueueBot {
         batch = batch.slice(0, process.env.BATCH_LIMIT || 10)
         console.log(`Sending batch of ${batch.length} extrinsics`);
         await this.sendBatch(batch);
-        this.cooldown = 4;
+        this.cooldown = 6;
       }
 
     } catch (error) {
